@@ -28,6 +28,9 @@
         .card.basis { border-top: 5px solid #9b59b6; }
         .card.basis .btn-launch { background-color: #9b59b6; }
         .card.basis .btn-launch:hover { background-color: #8e44ad; }
+        .card.regression { border-top: 5px solid #f39c12; }
+        .card.regression .btn-launch { background-color: #f39c12; }
+        .card.regression .btn-launch:hover { background-color: #d68910; }
     </style>
 </head>
 <body>
@@ -36,7 +39,18 @@
     <div class="subtitle">Interactive educational tools for exploring ML algorithms</div>
     
     <div class="category-section">
-        <h2 class="category-title">Classification (Supervised)</h2>
+        <h2 class="category-title">Regression</h2>
+        <div class="dashboard">
+            <div class="card regression">
+                <h3>Linear Regression</h3>
+                <p>Explore ordinary linear regression and polynomial basis-function linear regression with manual point placement, classic templates, and degree control.</p>
+                <a href="/regression" class="btn-launch">Launch Regression &rarr;</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="category-section">
+        <h2 class="category-title">Classification</h2>
         <div class="dashboard">
             <div class="card svm">
                 <h3>Linear SVM</h3>
@@ -53,7 +67,7 @@
     </div>
 
     <div class="category-section">
-        <h2 class="category-title">Clustering (Unsupervised)</h2>
+        <h2 class="category-title">Clustering</h2>
         <div class="dashboard">
             <div class="card">
                 <h3>Gaussian Mixture Model (EM)</h3>

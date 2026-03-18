@@ -1,89 +1,100 @@
 # Machine Learning Algorithm Visualizations
 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-Available-success.svg)](https://machine-learning-virtualization.onrender.com)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Available-success.svg)](https://machine-learning-visualization.onrender.com)
 [![Python](https://img.shields.io/badge/Python-3.x-blue.svg)](https://www.python.org/)
 [![Flask](https://img.shields.io/badge/Flask-Backend-black.svg)](https://flask.palletsprojects.com/)
 
-An interactive, web-based educational dashboard designed to visualize the inner workings of fundamental Machine Learning algorithms step-by-step. 
+An interactive web dashboard for exploring fundamental machine learning algorithms through direct manipulation and visual feedback.
 
-**🚀 Live Demo:** [https://machine-learning-visualization.onrender.com](https://machine-learning-visualization.onrender.com)
+Live Demo: [https://machine-learning-visualization.onrender.com](https://machine-learning-visualization.onrender.com)
 
-> ⚠️ **Note:** The backend is hosted on Render's free tier. It goes to sleep after 15 minutes of inactivity, so **the initial load may take 1-2 minutes**. Please be patient! Once awake, all operations are instantaneous.
-
----
-
-## 💡 About The Project
-
-Understanding how Machine Learning algorithms converge can be difficult through static equations alone. This project bridges the gap by providing a highly interactive visualization tool. It separates heavy mathematical computations (handled by a Python backend) from the visual rendering (handled by HTML5 Canvas on the frontend).
-
-### 📊 Currently Supported Algorithms:
-
-#### Classification (Supervised Learning)
-1. **Linear SVM (Support Vector Machine):**
-   - Visualizes the maximal margin hyperplane separating two classes using **Gradient Descent**.
-   - Dynamically highlights **Support Vectors** (points inside the margin or misclassified) during the optimization process.
-   - Allows real-time adjustment of the **C (Penalty)** parameter to observe the shift between hard-margin and soft-margin behavior.
-
-2. **Linear Classification with Basis Functions:**
-   - A static, high-DPI visual gallery demonstrating the core intuition behind the **Kernel Trick**.
-   - Showcases how complex, non-linearly separable datasets (e.g., Concentric Circles, Checkerboards, Sinusoidal waves, Parabolas) become linearly separable by applying mathematical feature transformations.
-   - Features beautifully rendered LaTeX equations explaining the exact spatial mapping.
-
-#### Clustering (Unsupervised Learning)
-3. **Gaussian Mixture Model (GMM) via EM Algorithm:**
-   - Visualizes **Soft Assignments**.
-   - Displays Expectation (E-Step) and Maximization (M-Step) separately.
-   - Dynamically renders covariance ellipses showing distribution shapes, stretching, and rotation.
-   
-4. **K-Means Clustering:**
-   - Visualizes **Hard Assignments** using exact Voronoi decision boundaries.
-   - Displays assignment steps (assigning points to nearest centroids) and update steps (moving centroids to cluster means).
+Note: The backend is hosted on Render's free tier. After inactivity, the service may sleep, so the first load can take 1-2 minutes.
 
 ---
 
-## ✨ Key Features
+## About
 
-- **Interactive Step-by-Step Playback:** Move forward and backward through exact algorithm steps (e.g., jump between E-Steps and M-Steps, or gradient steps) to see exactly how parameters are updated.
-- **Time Travel:** A history state management system allows you to undo steps and revisit previous iterations smoothly.
-- **Fast Forward:** Skip the tedious micro-adjustments and jump ahead by $N$ iterations instantly.
-- **Custom Data Generation:** - **Auto Generate:** Create multi-cluster or linearly separable data with random variances and covariances based on specific parameters.
-  - **Mouse Click:** Manually drop labeled or unlabeled data points directly onto the canvas to test edge cases.
-- **Responsive High-DPI Canvas:** Clean, grid-based coordinate system for accurate spatial representations, automatically scaled for Retina displays.
+This project is designed as a lightweight educational tool for building intuition about how machine learning models behave. The backend handles numerical computation in Python, while the frontend uses HTML5 Canvas and vanilla JavaScript for interactive visualization.
+
+The project currently includes interactive pages for regression, classification, and clustering.
+
+## Supported Visualizations
+
+### Regression
+
+1. **Linear Regression**
+   - Fit a straight line to manually placed 2D points.
+   - View the fitted line together with summary metrics such as R^2 and MSE.
+
+2. **Basis Function Linear Regression**
+   - Fit a linear model over polynomial basis functions.
+   - Adjust the polynomial degree to see how the fitted curve changes.
+   - View the expanded polynomial form directly in the model summary.
+
+### Classification
+
+3. **Linear SVM**
+   - Visualize the separating hyperplane for two classes.
+   - Step through gradient-based optimization and observe support vectors.
+   - Adjust the penalty parameter `C` to compare margin behavior.
+
+4. **Linear Classification with Basis Functions**
+   - A static visual gallery showing how basis transformations make non-linear data linearly separable.
+   - Includes examples such as stripes, sine waves, checkerboards, parabolas, and concentric structures.
+   - Uses LaTeX-rendered equations to explain the feature mappings.
+
+### Clustering
+
+5. **Gaussian Mixture Model (EM)**
+   - Visualize soft assignments during Expectation-Maximization.
+   - Step separately through E-steps and M-steps.
+   - Observe means, covariances, and confidence ellipses evolve over time.
+
+6. **K-Means Clustering**
+   - Visualize hard assignments and centroid updates.
+   - Inspect Voronoi-style decision regions as centroids move.
+   - Step through assignment and update phases iteratively.
 
 ---
 
-## 🛠️ Tech Stack
+## Key Features
 
-- **Backend:** Python, Flask, NumPy, SciPy (for strict mathematical matrix computations, gradients, and PDF calculations).
-- **Frontend:** Vanilla JavaScript, HTML5 Canvas (for lightweight, zero-dependency, real-time rendering), CSS3, MathJax (for LaTeX rendering).
+- Interactive point placement directly on the canvas.
+- Classic template datasets for regression examples.
+- Polynomial degree control for basis-function regression.
+- Step-by-step playback for iterative algorithms such as SVM, GMM, and K-Means.
+- Forward and backward navigation through saved algorithm states.
+- Fast-forward controls for jumping multiple iterations at once.
+- Clean coordinate-grid visualizations built with HTML5 Canvas.
 
 ---
 
-## 💻 Local Installation & Usage
+## Tech Stack
 
-If you want to run this project locally on your machine:
+- **Backend:** Python, Flask, NumPy, SciPy
+- **Frontend:** Vanilla JavaScript, HTML5 Canvas, CSS, MathJax
 
-1. **Clone the repository:**
+---
+
+## Local Installation
+
+1. Clone the repository:
    ```bash
    git clone https://github.com/Archerui/Machine-Learning-Visualization.git
    cd Machine-Learning-Visualization
    ```
 
-2. **Create a virtual environment (Optional but recommended):**
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows use: venv\Scripts\activate
-   ```
-
-3. **Install dependencies:**
+2. Install dependencies:
    ```bash
    pip install -r requirements.txt
    ```
 
-4. **Run the application:**
+3. Run the app:
    ```bash
    python app.py
    ```
 
-5. **Open your browser:**
-   Navigate to `http://127.0.0.1:5000`
+4. Open:
+   `http://127.0.0.1:5000`
+
+

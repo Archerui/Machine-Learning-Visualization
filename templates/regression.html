@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Linear Regression Visualization</title>
+    <style>
+        :root {
+            --bg-app: #f4f7fb;
+            --bg-panel: #ffffff;
+            --bg-soft: #eef3f8;
+            --text-main: #1f2d3d;
+            --text-muted: #6b7b8c;
+            --border-soft: #d9e2ec;
+            --accent-linear: #1479ff;
+            --accent-basis: #ff7a18;
+            --accent-deep: #17324d;
+            --shadow-soft: 0 12px 30px -18px rgba(15, 23, 42, 0.35);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 24px 0 40px 0;
+            background: linear-gradient(180deg, #f8fbff 0%, var(--bg-app) 100%);
+            color: var(--text-main);
+            font-family: "Segoe UI", Tahoma, sans-serif;
+            display: flex;
+            justify-content: center;
+        }
+
+        .page {
+            width: 920px;
+            max-width: calc(100vw - 32px);
+        }
+
+        .top-nav { margin-bottom: 12px; }
+
+        .btn-back {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .btn-back:hover { color: var(--accent-linear); }
+
+        h1 {
+            margin: 0;
+            font-size: 34px;
+            font-weight: 800;
+            letter-spacing: -0.6px;
+        }
+
+        .subtitle {
+            margin: 8px 0 24px 0;
+            color: var(--text-muted);
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .card {
+            background: var(--bg-panel);
+            border: 1px solid rgba(217, 226, 236, 0.9);
+            border-radius: 18px;
+            box-shadow: var(--shadow-soft);
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .card-title {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 800;
+        }
+
+        .row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        select,
+        input[type="number"] {
+            border: 1px solid var(--border-soft);
+            border-radius: 10px;
+            padding: 9px 11px;
+            background: var(--bg-soft);
+            color: var(--text-main);
+            font-size: 14px;
+            font-weight: 700;
+            outline: none;
+        }
+
+        select:focus,
+        input[type="number"]:focus {
+            border-color: rgba(20, 121, 255, 0.55);
+            background: #fff;
+        }
+
+        select { min-width: 170px; }
+        input[type="number"] { width: 76px; text-align: center; }
+
+        button {
+            border: none;
+            border-radius: 11px;
+            padding: 9px 15px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 800;
+            transition: transform 0.15s ease, background 0.15s ease, opacity 0.15s ease;
+        }
+
+        button:hover:not(:disabled) { transform: translateY(-1px); }
+        button:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        .btn-primary {
+            background: var(--accent-deep);
+            color: #fff;
+        }
+
+        .btn-primary:hover:not(:disabled) { background: #0f2437; }
+
+        .btn-secondary {
+            background: #dfe7ef;
+            color: var(--text-main);
+        }
+
+        .btn-secondary:hover:not(:disabled) { background: #d2dbe5; }
+
+        .btn-danger {
+            background: #ffe2dd;
+            color: #b23b2a;
+        }
+
+        .btn-danger:hover:not(:disabled) { background: #ffd1c9; }
+
+        .mode-chip {
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: #edf4ff;
+            color: var(--accent-linear);
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .mode-chip.basis {
+            background: #fff1e6;
+            color: var(--accent-basis);
+        }
+
+        .hint {
+            font-size: 12px;
+            line-height: 1.5;
+            color: var(--text-muted);
+        }
+
+        .status-panel {
+            background: var(--bg-panel);
+            border-radius: 18px;
+            border: 1px solid rgba(217, 226, 236, 0.9);
+            box-shadow: var(--shadow-soft);
+            padding: 16px 18px;
+            margin-bottom: 14px;
+        }
+
+        .status-title {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .status-main {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--text-main);
+            min-height: 26px;
+        }
+
+        .status-sub {
+            margin-top: 8px;
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.6;
+            min-height: 20px;
+        }
+
+        .status-detail {
+            margin-top: 8px;
+            font-size: 13px;
+            color: var(--text-main);
+            line-height: 1.7;
+            min-height: 20px;
+            word-break: break-word;
+        }
+
+        .canvas-shell {
+            background: var(--bg-panel);
+            border-radius: 20px;
+            border: 1px solid rgba(217, 226, 236, 0.9);
+            box-shadow: var(--shadow-soft);
+            padding: 12px;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            background: linear-gradient(180deg, #ffffff 0%, #fcfdff 100%);
+            border-radius: 14px;
+            cursor: crosshair;
+        }
+
+        .footer-hint {
+            margin-top: 10px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .hidden { display: none; }
+
+        @media (max-width: 900px) {
+            .settings-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <div class="top-nav"><a href="/" class="btn-back">&larr; Back to Dashboard</a></div>
+        <h1>Linear Regression Visualization</h1>
+        <div class="subtitle">Compare ordinary linear regression with basis-function linear regression. The polynomial basis model is still linear in its parameters, but it can fit non-linear curves through transformed features.</div>
+
+        <div class="settings-grid">
+            <div class="card">
+                <div class="card-title">Mode</div>
+                <div class="row">
+                    <label for="taskMode">Regression Type:</label>
+                    <select id="taskMode">
+                        <option value="linear">Linear Regression</option>
+                        <option value="basis">Basis Function Regression</option>
+                    </select>
+                </div>
+                <div class="row">
+                    <span id="modeChip" class="mode-chip">Linear</span>
+                </div>
+                <div id="degreeRow" class="row hidden">
+                    <label for="polyDegree">Polynomial Degree:</label>
+                    <input type="number" id="polyDegree" min="1" max="8" value="2">
+                </div>
+                <div class="hint" id="modeHint"></div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Data</div>
+                <div class="row">
+                    <label for="templateSelect">Classic Template:</label>
+                    <select id="templateSelect"></select>
+                </div>
+                <div class="row">
+                    <button class="btn-primary" onclick="loadSelectedTemplate()">Load Template</button>
+                    <button class="btn-danger" onclick="clearCurrentData()">Clear Data</button>
+                    <button id="toggleGridBtn" class="btn-secondary" onclick="toggleGrid()">Hide Grid</button>
+                </div>
+                <div class="hint" id="dataHint"></div>
+                <div class="hint">
+                    Left click adds a point. Right click removes the nearest point.
+                </div>
+            </div>
+        </div>
+
+        <div class="status-panel">
+            <div class="status-title">Model Summary</div>
+            <div id="statusMain" class="status-main">Click to add points or load a template.</div>
+            <div id="statusSub" class="status-sub">Templates are auto-fitted as soon as they load.</div>
+            <div id="statusDetail" class="status-detail"></div>
+        </div>
+
+        <div class="canvas-shell">
+            <canvas id="canvas" width="896" height="560"></canvas>
+        </div>
+        <div id="footerHint" class="footer-hint"></div>
+    </div>
+
+<script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    const view = { minX: -5, maxX: 5, minY: -5, maxY: 5 };
+    const state = {
+        mode: 'linear',
+        points: [],
+        linearFit: null,
+        basisFit: null,
+        isGridVisible: true,
+        autoFitTimer: null,
+        requestSeq: 0
+    };
+
+    const linearTemplateDefs = [
+        { id: 'positive', name: 'Positive Trend' },
+        { id: 'negative', name: 'Negative Trend' },
+        { id: 'flat', name: 'Nearly Flat with Noise' },
+        { id: 'outlier', name: 'Outlier Challenge' },
+        { id: 'curved', name: 'Curved Mismatch' }
+    ];
+
+    const basisTemplateDefs = [
+        { id: 'quadratic', name: 'Quadratic Bowl' },
+        { id: 'cubic', name: 'Cubic S Curve' },
+        { id: 'sine', name: 'Sinusoidal Trend' },
+        { id: 'wshape', name: 'W Shape' },
+        { id: 'mixed', name: 'Mixed Polynomial Trend' }
+    ];
+
+    function cx(x) { return ((x - view.minX) / (view.maxX - view.minX)) * canvas.width; }
+    function cy(y) { return canvas.height - ((y - view.minY) / (view.maxY - view.minY)) * canvas.height; }
+    function sx(px) { return (px / canvas.width) * (view.maxX - view.minX) + view.minX; }
+    function sy(py) { return view.maxY - (py / canvas.height) * (view.maxY - view.minY); }
+    function clamp(value, low, high) { return Math.max(low, Math.min(high, value)); }
+    function fract(value) { return value - Math.floor(value); }
+    function seededNoise(seed) { return fract(Math.sin(seed * 12.9898) * 43758.5453) * 2 - 1; }
+    function formatSigned(value) { return value >= 0 ? `+ ${Math.abs(value).toFixed(3)}` : `- ${Math.abs(value).toFixed(3)}`; }
+
+    function formatPolynomialTerm(weight, power, isFirst) {
+        const absWeight = Math.abs(weight).toFixed(3);
+        let term = '';
+
+        if (power === 0) {
+            term = absWeight;
+        } else if (power === 1) {
+            term = `${absWeight}x`;
+        } else {
+            term = `${absWeight}x^${power}`;
+        }
+
+        if (isFirst) {
+            return weight < 0 ? `- ${term}` : term;
+        }
+        return weight < 0 ? `- ${term}` : `+ ${term}`;
+    }
+
+    function buildPolynomialSummary(fit) {
+        const pieces = [];
+        const terms = fit.weights.map((weight, index) => ({
+            weight: weight,
+            power: fit.powers[index]
+        })).sort((a, b) => b.power - a.power);
+
+        for (let i = 0; i < terms.length; i++) {
+            pieces.push(formatPolynomialTerm(terms[i].weight, terms[i].power, i === 0));
+        }
+        return pieces.join(' ');
+    }
+
+    function getCurrentPoints() {
+        return state.points;
+    }
+
+    function getCurrentFit() {
+        return state.mode === 'linear' ? state.linearFit : state.basisFit;
+    }
+
+    function setCurrentPoints(points) {
+        state.points = points;
+        state.linearFit = null;
+        state.basisFit = null;
+    }
+
+    function drawGrid() {
+        if (!state.isGridVisible) return;
+
+        for (let x = Math.ceil(view.minX); x <= Math.floor(view.maxX); x++) {
+            ctx.beginPath();
+            ctx.moveTo(cx(x), 0);
+            ctx.lineTo(cx(x), canvas.height);
+            ctx.strokeStyle = x === 0 ? '#9fb0c1' : '#edf2f7';
+            ctx.lineWidth = x === 0 ? 1.6 : 1;
+            ctx.stroke();
+        }
+
+        for (let y = Math.ceil(view.minY); y <= Math.floor(view.maxY); y++) {
+            ctx.beginPath();
+            ctx.moveTo(0, cy(y));
+            ctx.lineTo(canvas.width, cy(y));
+            ctx.strokeStyle = y === 0 ? '#9fb0c1' : '#edf2f7';
+            ctx.lineWidth = y === 0 ? 1.6 : 1;
+            ctx.stroke();
+        }
+    }
+
+    function evaluateBasisCurve(x, fit) {
+        let y = 0;
+        for (let i = 0; i < fit.weights.length; i++) {
+            y += fit.weights[i] * (x ** fit.powers[i]);
+        }
+        return y;
+    }
+
+    function drawFittedCurve(fit, color) {
+        ctx.beginPath();
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 3.2;
+
+        let started = false;
+        for (let x = view.minX; x <= view.maxX + 1e-9; x += 0.03) {
+            const y = state.mode === 'linear'
+                ? fit.slope * x + fit.intercept
+                : evaluateBasisCurve(x, fit);
+
+            if (!started) {
+                ctx.moveTo(cx(x), cy(y));
+                started = true;
+            } else {
+                ctx.lineTo(cx(x), cy(y));
+            }
+        }
+        ctx.stroke();
+    }
+
+    function drawPoints() {
+        const color = state.mode === 'linear' ? '#1479ff' : '#ff7a18';
+        getCurrentPoints().forEach((point) => {
+            ctx.beginPath();
+            ctx.arc(cx(point.x), cy(point.y), 5, 0, Math.PI * 2);
+            ctx.fillStyle = color;
+            ctx.fill();
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 1.8;
+            ctx.stroke();
+        });
+    }
+
+    function populateTemplateOptions() {
+        const defs = state.mode === 'linear' ? linearTemplateDefs : basisTemplateDefs;
+        const select = document.getElementById('templateSelect');
+        select.innerHTML = '';
+        defs.forEach((template) => {
+            const option = document.createElement('option');
+            option.value = template.id;
+            option.textContent = template.name;
+            select.appendChild(option);
+        });
+    }
+
+    function buildLinearTemplate(id) {
+        const points = [];
+        const addBand = (slope, intercept, noise, count, xStart, xStep) => {
+            for (let i = 0; i < count; i++) {
+                const x = xStart + i * xStep;
+                const y = slope * x + intercept + seededNoise(i + count * 13) * noise;
+                points.push({ x: clamp(x, -5, 5), y: clamp(y, -5, 5) });
+            }
+        };
+
+        if (id === 'positive') addBand(0.9, 0.7, 0.5, 18, -4.2, 0.48);
+        if (id === 'negative') addBand(-1.05, 0.5, 0.48, 18, -4.2, 0.48);
+        if (id === 'flat') addBand(0.05, -0.25, 0.85, 22, -4.4, 0.42);
+        if (id === 'outlier') {
+            addBand(0.7, -0.5, 0.3, 18, -4.1, 0.46);
+            points.push({ x: 3.6, y: -4.2 });
+        }
+        if (id === 'curved') {
+            for (let i = 0; i < 21; i++) {
+                const x = -4.3 + i * 0.43;
+                const y = 0.22 * x * x - 1.4 + seededNoise(i + 90) * 0.35;
+                points.push({ x: clamp(x, -5, 5), y: clamp(y, -5, 5) });
+            }
+        }
+
+        return points;
+    }
+
+    function buildBasisTemplate(id) {
+        const points = [];
+        const push = (x, y) => points.push({ x: clamp(x, -5, 5), y: clamp(y, -5, 5) });
+
+        if (id === 'quadratic') {
+            for (let i = 0; i < 23; i++) {
+                const x = -4.4 + i * 0.4;
+                push(x, 0.22 * x * x - 1.5 + seededNoise(i + 30) * 0.28);
+            }
+        }
+
+        if (id === 'cubic') {
+            for (let i = 0; i < 23; i++) {
+                const x = -4.4 + i * 0.4;
+                push(x, 0.08 * x * x * x - 0.65 * x + seededNoise(i + 60) * 0.22);
+            }
+        }
+
+        if (id === 'sine') {
+            for (let i = 0; i < 23; i++) {
+                const x = -4.4 + i * 0.4;
+                push(x, 2.1 * Math.sin(x) + seededNoise(i + 90) * 0.22);
+            }
+        }
+
+        if (id === 'wshape') {
+            for (let i = 0; i < 25; i++) {
+                const x = -4.8 + i * 0.4;
+                push(x, 0.04 * x * x * x * x - 0.55 * x * x + 1.1 + seededNoise(i + 120) * 0.20);
+            }
+        }
+
+        if (id === 'mixed') {
+            for (let i = 0; i < 23; i++) {
+                const x = -4.4 + i * 0.4;
+                push(x, -0.018 * x * x * x * x + 0.16 * x * x * x + 0.1 * x * x - 1.2 * x - 0.2 + seededNoise(i + 150) * 0.20);
+            }
+        }
+
+        return points;
+    }
+
+    function updateStatus() {
+        const points = getCurrentPoints();
+        const fit = getCurrentFit();
+        const statusMain = document.getElementById('statusMain');
+        const statusSub = document.getElementById('statusSub');
+        const statusDetail = document.getElementById('statusDetail');
+        const footerHint = document.getElementById('footerHint');
+
+        if (state.mode === 'linear') {
+            footerHint.innerHTML = '<span class="legend-dot" style="background:#1479ff;"></span> points &nbsp;&nbsp; <span style="display:inline-block;width:22px;height:3px;background:#17324d;border-radius:99px;vertical-align:middle;"></span> fitted line';
+            statusDetail.textContent = '';
+            if (!fit) {
+                statusMain.textContent = points.length < 2 ? 'Linear regression needs at least two points.' : 'Unable to fit a line.';
+                statusSub.textContent = points.length < 2 ? `Current points: ${points.length}.` : 'Try adding points with different x-values.';
+                return;
+            }
+            statusMain.textContent = `y = ${fit.slope.toFixed(3)}x ${formatSigned(fit.intercept)}`;
+            statusSub.textContent = `${fit.count} points | R^2 = ${fit.r2.toFixed(3)} | MSE = ${fit.mse.toFixed(3)}`;
+            return;
+        }
+
+        footerHint.innerHTML = '<span class="legend-dot" style="background:#ff7a18;"></span> points &nbsp;&nbsp; <span style="display:inline-block;width:22px;height:3px;background:#17324d;border-radius:99px;vertical-align:middle;"></span> polynomial basis fit';
+        if (!fit) {
+            statusMain.textContent = 'Basis-function regression needs at least two points.';
+            statusSub.textContent = `${points.length} points | Degree = ${document.getElementById('polyDegree').value}`;
+            statusDetail.textContent = '';
+            return;
+        }
+
+        statusMain.textContent = `f(x) = ${buildPolynomialSummary(fit)}`;
+        statusSub.textContent = `${fit.count} points | Basis terms = ${fit.weights.length} | R^2 = ${fit.r2.toFixed(3)} | MSE = ${fit.mse.toFixed(3)}`;
+        statusDetail.textContent = '';
+    }
+
+    function render() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawGrid();
+        if (state.mode === 'linear' && state.linearFit) drawFittedCurve(state.linearFit, '#17324d');
+        if (state.mode === 'basis' && state.basisFit) drawFittedCurve(state.basisFit, '#17324d');
+        drawPoints();
+        updateStatus();
+    }
+
+    function toggleGrid() {
+        state.isGridVisible = !state.isGridVisible;
+        document.getElementById('toggleGridBtn').textContent = state.isGridVisible ? 'Hide Grid' : 'Show Grid';
+        render();
+    }
+
+    function loadSelectedTemplate() {
+        const id = document.getElementById('templateSelect').value;
+        setCurrentPoints(state.mode === 'linear' ? buildLinearTemplate(id) : buildBasisTemplate(id));
+        render();
+        scheduleAutoFit();
+    }
+
+    function clearCurrentData() {
+        setCurrentPoints([]);
+        render();
+    }
+
+    function scheduleAutoFit() {
+        clearTimeout(state.autoFitTimer);
+        state.autoFitTimer = setTimeout(() => fitCurrentMode(true), 100);
+    }
+
+    function fitCurrentMode(silent) {
+        const points = getCurrentPoints();
+        const requestId = ++state.requestSeq;
+        const distinctX = new Set(points.map(point => point.x.toFixed(4)));
+
+        if (points.length < 2 || distinctX.size < 2) {
+            if (state.mode === 'linear') state.linearFit = null;
+            if (state.mode === 'basis') state.basisFit = null;
+            render();
+            return;
+        }
+
+        if (state.mode === 'linear') {
+            fetch('/api/regression/linear-fit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ points: points.map(point => [point.x, point.y]) })
+            })
+            .then(res => res.json().then(data => ({ ok: res.ok, data: data })))
+            .then(({ ok, data }) => {
+                if (requestId !== state.requestSeq) return;
+                if (!ok || data.error) {
+                    state.linearFit = null;
+                    if (!silent && data.error) alert(data.error);
+                    render();
+                    return;
+                }
+                state.linearFit = data;
+                render();
+            });
+            return;
+        }
+
+        fetch('/api/regression/basis-fit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                points: points.map(point => [point.x, point.y]),
+                degree: parseInt(document.getElementById('polyDegree').value, 10)
+            })
+        })
+        .then(res => res.json().then(data => ({ ok: res.ok, data: data })))
+        .then(({ ok, data }) => {
+            if (requestId !== state.requestSeq) return;
+            if (!ok || data.error) {
+                state.basisFit = null;
+                if (!silent && data.error) alert(data.error);
+                render();
+                return;
+            }
+            state.basisFit = data;
+            render();
+        });
+    }
+
+    function findNearestPointIndex(points, x, y) {
+        let bestIndex = -1;
+        let bestDistance = Infinity;
+        for (let i = 0; i < points.length; i++) {
+            const dx = points[i].x - x;
+            const dy = points[i].y - y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            if (distance < bestDistance) {
+                bestDistance = distance;
+                bestIndex = i;
+            }
+        }
+        return bestDistance <= 0.45 ? bestIndex : -1;
+    }
+
+    canvas.addEventListener('mousedown', (event) => {
+        const rect = canvas.getBoundingClientRect();
+        const x = sx(event.clientX - rect.left);
+        const y = sy(event.clientY - rect.top);
+        const points = [...getCurrentPoints()];
+
+        if (event.button === 2) {
+            const nearest = findNearestPointIndex(points, x, y);
+            if (nearest !== -1) {
+                points.splice(nearest, 1);
+                setCurrentPoints(points);
+                render();
+                scheduleAutoFit();
+            }
+            return;
+        }
+
+        points.push({ x: clamp(x, -5, 5), y: clamp(y, -5, 5) });
+        setCurrentPoints(points);
+        render();
+        scheduleAutoFit();
+    });
+
+    canvas.addEventListener('contextmenu', (event) => event.preventDefault());
+
+    function updateModeUI() {
+        const isBasis = state.mode === 'basis';
+        document.getElementById('degreeRow').classList.toggle('hidden', !isBasis);
+
+        const chip = document.getElementById('modeChip');
+        chip.textContent = isBasis ? 'Basis Function' : 'Linear';
+        chip.classList.toggle('basis', isBasis);
+
+        document.getElementById('modeHint').textContent = isBasis
+            ? 'The model is linear in the weights, but non-linear in x because of polynomial basis functions phi(x) = [1, x, x^2, ...].'
+            : 'Standard least-squares linear regression with a single straight line.';
+
+        document.getElementById('dataHint').textContent = isBasis
+            ? 'Use degree to inspect how polynomial basis expansion changes the fitted curve.'
+            : 'Click anywhere to add a continuous point. The fitted straight line updates automatically.';
+
+        populateTemplateOptions();
+        render();
+    }
+
+    document.getElementById('taskMode').addEventListener('change', (event) => {
+        state.mode = event.target.value;
+        updateModeUI();
+        scheduleAutoFit();
+    });
+
+    document.getElementById('polyDegree').addEventListener('input', () => {
+        const degreeInput = document.getElementById('polyDegree');
+        degreeInput.value = clamp(parseInt(degreeInput.value || '1', 10), 1, 8);
+        state.basisFit = null;
+        render();
+        if (state.mode === 'basis') scheduleAutoFit();
+    });
+
+    updateModeUI();
+    loadSelectedTemplate();
+</script>
+</body>
+</html>

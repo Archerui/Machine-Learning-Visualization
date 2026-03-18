@@ -40,6 +40,10 @@ def svm_page():
 def basis_page():
     return render_template('basis.html')
 
+@app.route('/regression')
+def regression_page():
+    return render_template('regression.html')
+
 # ==========================================
 # 1. GMM API
 # ==========================================
@@ -219,6 +223,81 @@ def handle_svm_action():
             if svm_current_index == len(svm_state_history) - 1: svm_state_history.append(compute_svm_next_step(svm_state_history[svm_current_index]))
             svm_current_index += 1
     return jsonify(svm_state_history[svm_current_index])
+
+# ==========================================
+# 4. Regression API
+# ==========================================
+def build_1d_polynomial_features(x, degree):
+    features = [np.ones_like(x)]
+    powers = [0]
+
+    for power in range(1, degree + 1):
+        features.append(x ** power)
+        powers.append(power)
+
+    return np.column_stack(features), powers
+
+
+@app.route('/api/regression/linear-fit', methods=['POST'])
+def fit_linear_regression():
+    data = request.get_json()
+    points = np.array(data.get('points', []), dtype=float)
+
+    if len(points) < 2:
+        return jsonify({"error": "Need at least two points to fit a line."}), 400
+
+    x = points[:, 0]
+    y = points[:, 1]
+    if np.std(x) < 1e-8:
+        return jsonify({"error": "Linear regression needs at least two distinct x-values."}), 400
+
+    slope, intercept = np.polyfit(x, y, 1)
+    y_pred = slope * x + intercept
+
+    mse = float(np.mean((y - y_pred) ** 2))
+    ss_res = np.sum((y - y_pred) ** 2)
+    ss_tot = np.sum((y - np.mean(y)) ** 2)
+    r2 = float(1.0 - ss_res / ss_tot) if ss_tot > 1e-12 else 1.0
+
+    return jsonify({
+        "slope": float(slope),
+        "intercept": float(intercept),
+        "mse": mse,
+        "r2": r2,
+        "count": int(len(points))
+    })
+
+
+@app.route('/api/regression/basis-fit', methods=['POST'])
+def fit_basis_regression():
+    data = request.get_json()
+    points = np.array(data.get('points', []), dtype=float)
+    degree = int(data.get('degree', 2))
+
+    if len(points) < 2:
+        return jsonify({"error": "Need at least two points to fit basis-function regression."}), 400
+    if degree < 1 or degree > 8:
+        return jsonify({"error": "Polynomial degree must be between 1 and 8."}), 400
+
+    x = points[:, 0]
+    y = points[:, 1]
+
+    Phi, powers = build_1d_polynomial_features(x, degree)
+    weights, *_ = np.linalg.lstsq(Phi, y, rcond=None)
+    y_pred = Phi @ weights
+    mse = float(np.mean((y - y_pred) ** 2))
+    ss_res = np.sum((y - y_pred) ** 2)
+    ss_tot = np.sum((y - np.mean(y)) ** 2)
+    r2 = float(1.0 - ss_res / ss_tot) if ss_tot > 1e-12 else 1.0
+
+    return jsonify({
+        "degree": degree,
+        "weights": weights.tolist(),
+        "powers": powers,
+        "mse": mse,
+        "r2": r2,
+        "count": int(len(x)),
+    })
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
