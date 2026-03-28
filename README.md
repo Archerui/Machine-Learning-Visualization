@@ -4,7 +4,7 @@
 [![Python](https://img.shields.io/badge/Python-3.x-blue.svg)](https://www.python.org/)
 [![Flask](https://img.shields.io/badge/Flask-Backend-black.svg)](https://flask.palletsprojects.com/)
 
-An interactive web dashboard for exploring fundamental machine learning algorithms through direct manipulation and visual feedback.
+An interactive web app for exploring fundamental machine learning algorithms through direct manipulation and visual feedback.
 
 Live Demo: [https://machine-learning-visualization.onrender.com](https://machine-learning-visualization.onrender.com)
 
@@ -18,6 +18,28 @@ This project is designed as a lightweight educational tool for building intuitio
 
 The project currently includes interactive pages for regression, classification, and clustering.
 
+
+
+## Screenshots
+
+![main](screenshots/main.png)
+
+
+![main](screenshots/lr1.png)
+
+
+![main](screenshots/lr3.png)
+
+
+![main](screenshots/svm.png)
+
+
+![main](screenshots/lc.png)
+
+![main](screenshots/gmm.png)
+
+
+---
 ## Supported Visualizations
 
 ### Regression
@@ -26,7 +48,7 @@ The project currently includes interactive pages for regression, classification,
    - Fit a straight line to manually placed 2D points.
    - View the fitted line together with summary metrics such as R^2 and MSE.
 
-2. **Basis Function Linear Regression**
+2. **Linear Regression with Basis Functions**
    - Fit a linear model over polynomial basis functions.
    - Adjust the polynomial degree to see how the fitted curve changes.
    - View the expanded polynomial form directly in the model summary.
@@ -69,13 +91,6 @@ The project currently includes interactive pages for regression, classification,
 
 ---
 
-## Tech Stack
-
-- **Backend:** Python, Flask, NumPy, SciPy
-- **Frontend:** Vanilla JavaScript, HTML5 Canvas, CSS, MathJax
-
----
-
 ## Local Installation
 
 1. Clone the repository:
@@ -96,5 +111,4 @@ The project currently includes interactive pages for regression, classification,
 
 4. Open:
    `http://127.0.0.1:5000`
-
 
